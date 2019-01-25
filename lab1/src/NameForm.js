@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 class NameForm extends React.Component {
       constructor(props) {
         super(props);
-        this.state = {value: ''};
-
+        this.state = {value: '', nameAvailable:false, isValid:true};
 
 
         this.handleChange = this.handleChange.bind(this);
@@ -21,19 +20,23 @@ class NameForm extends React.Component {
         var hello = 'Hello, ' + this.state.value + '!';
         this.setState({name:hello});
         //alert('Hello, ' + this.state.value);
-        this.validateForm();
+        if (/[a-zA-Z]+/.test (this.state.value)) {
+          this.setState ({nameAvailable:true});
+
+        }
+        else {
+            this.setState({isValid:false});
+          }
+
+        //this.validateForm();
 
         event.preventDefault();
       }
 
       render() {
-        if (this.state.name) {
-          return (
-            <p>{this.state.name}</p>
-            );
-          } else
         return (
-          <div>
+          <div>{(!this.state.nameAvailable) ?
+
           <form onSubmit={this.handleSubmit}>
             <label>
               Name:
@@ -41,11 +44,12 @@ class NameForm extends React.Component {
             </label>
 
             <input type="submit" value="Submit"/>
+            {(!this.state.isValid) ? <p> <text style={{color: 'red', fontWeight: 'bold'}}> Must be a valid name </text> </p> : null }
           </form>
-          <p>{this.state.error}</p>
 
+          : <p><text style={{color: 'green',fontWeight: 'bold'}}> Good Morning {this.state.value} </text> </p>}
           </div>
-        );
-      }
+          );
     }
+  }
      export default NameForm;
