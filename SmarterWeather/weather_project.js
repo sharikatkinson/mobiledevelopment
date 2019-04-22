@@ -25,7 +25,14 @@ import OpenWeatherMap from "./open_weather_map";
 class WeatherProject extends Component {
   constructor(props) {
     super(props);
-    this.state = { forecast: null };
+    this.state = { forecast: null, clock: "", index:0,
+    images:
+    [require("./assets/photo1.jpg"),
+    require("./assets/photo2.jpg"),
+    require("./assets/photo3.jpg"),
+    require("./assets/photo4.jpg"),
+    require("./assets/photo5.jpg")]
+  };
   }
 
 
@@ -83,8 +90,21 @@ class WeatherProject extends Component {
         }
       }
 
+updateImage = () => {
+  this.setState({index:(this.state.index+1)%2});
+}
+
+updateClock = () => {
+  let time =(new Date()).toLocaleTimeString();
+  this.setState({ clock:time});
+}
+
   componentDidMount() {
+
     console.log("Mounted")
+        this.updateClock()
+        setInterval(this.updateClock,1000);
+        setInterval(this.updateImage,5000);
         navigator.geolocation.getCurrentPosition(
           initialPosition => {
             this._getForecastForCoords(
@@ -106,6 +126,7 @@ class WeatherProject extends Component {
       .done();
       this._retrieveData();
   }
+
 
   _getForecastForZip = zip => {
     // Store zip code
@@ -147,13 +168,10 @@ class WeatherProject extends Component {
     }
 
     return (
-      <PhotoBackdrop image={this.state.newPostImage} >
+      <PhotoBackdrop image={this.state.images[this.state.index].uri} >
         <View style={styles.overlay}>
           <View style={styles.row}>
-            <Text style={textStyles.mainText}>
-              Forecast for
-            </Text>
-
+            <Text style={textStyles.mainText}>{this.state.clock}</Text>
             <View style={styles.zipContainer}>
               <TextInput
                 style={[textStyles.mainText, styles.zipCode]}
