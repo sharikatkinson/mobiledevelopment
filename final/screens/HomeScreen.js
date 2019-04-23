@@ -1,132 +1,61 @@
-import React from 'react';
-import {
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { WebBrowser } from 'expo';
+import React, { Component } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import SearchInput, { createFilter } from 'react-native-search-filter';
+const KEYS_TO_FILTERS = ['user.name', 'subject'];
 
-import { MonoText } from '../components/StyledText';
-
-export default class HomeScreen extends React.Component {
-  static navigationOptions = {
-    header: null,
-  };
-  _gotoScreen = (key) => {
-    console.log("Going to " + key);
+export default class App extends Component<{}> {
+ constructor(props) {
+    super(props);
+    this.state = {
+      searchTerm: ''
+    }
+  }
+  searchUpdated(term) {
+    this.setState({ searchTerm: term })
   }
   render() {
-    const {navigate} = this.props.navigation;
+    const filteredEmails = emails.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.getStartedContainer}>
-            <Text style={styles.getStartedText}>Cats are amazing</Text>
-            <FlatList
-             data={[{key: 'cat1',image: require('../assets/images/cat1.png')}, {key: 'cat2',image: require('../assets/images/cat2.png')}]}
-             keyExtractor={this._keyExtractor}
-              renderItem={({item}) => <TouchableOpacity onPress={(event) => { this.props.navigation.navigate('Detail')}}>
-                <Image source={item.image} style={{width:200,height:200}} />
-              </TouchableOpacity>}
-            />
-          </View>
+        <SearchInput
+          onChangeText={(term) => { this.searchUpdated(term) }}
+          style={styles.searchInput}
+          placeholder="Type a message to search"
+          />
+        <ScrollView>
+          {filteredEmails.map(email => {
+            return (
+              <TouchableOpacity onPress={()=>alert(email.user.name)} key={email.id} style={styles.emailItem}>
+                <View>
+                  <Text>{email.user.name}</Text>
+                  <Text style={styles.emailSubject}>{email.subject}</Text>
+                </View>
+              </TouchableOpacity>
+            )
+          })}
         </ScrollView>
       </View>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'flex-start'
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  emailItem:{
+    borderBottomWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.3)',
+    padding: 10
   },
-  contentContainer: {
-    paddingTop: 30,
+  emailSubject: {
+    color: 'rgba(0,0,0,0.5)'
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+  searchInput:{
+    padding: 10,
+    borderColor: '#CCC',
+    borderWidth: 1
+  }
 });
